@@ -1,42 +1,73 @@
-import React, { Component, useState } from "react";
-import '../styles/App.css';
+
+import React, { Component } from "react";
+import "./App.css";
 
 class App extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            renderBall: false,
-            posi : 0,
-            ballPosition: { left: "0px" }
-        };
-        this.renderChoice = this.renderBallOrButton.bind(this)
-        this.buttonClickHandler = this.buttonClickHandler.bind(this)
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      ballRendered: false,
+      position: 0
     };
 
-    buttonClickHandler() {
-   
-   }
-    renderBallOrButton() {
-		if (this.state.renderBall) {
-		    return <div className="ball" style={this.state.ballPosition}></div>
-		} else {
-		    return <button onClick={this.buttonClickHandler} >Start</button>
-		}
+    this.buttonClickHandler = this.buttonClickHandler.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  // Start the game
+  buttonClickHandler() {
+    this.setState({
+      ballRendered: true
+    });
+  }
+
+  // Detect keyboard events
+  handleKeyDown(event) {
+    if (event.keyCode === 39 && this.state.ballRendered) {
+      this.setState((prevState) => ({
+        position: prevState.position + 5
+      }));
+    }
+  }
+
+  // Add event listener when component loads
+  componentDidMount() {
+    document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  // Remove event listener when component is removed
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  // Decide whether to show button or ball
+  renderChoice() {
+    if (!this.state.ballRendered) {
+      return (
+        <button className="start" onClick={this.buttonClickHandler}>
+          Start
+        </button>
+      );
     }
 
-    // bind ArrowRight keydown event
-    componentDidMount() {
-      
-    }
+    return (
+      <div
+        className="ball"
+        style={{
+          left: `${this.state.position}px`
+        }}
+      ></div>
+    );
+  }
 
-    render() {
-        return (
-            <div className="playground">
-                {this.renderBallOrButton()}
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="game">
+        {this.renderChoice()}
+      </div>
+    );
+  }
 }
-
 
 export default App;
